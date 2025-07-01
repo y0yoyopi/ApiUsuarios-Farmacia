@@ -21,7 +21,7 @@ functions:
           path: /usuarios/crear
           method: post
           cors: true
-	  integration: lambda
+          integration: lambda
 
   LoginUsuario:
     handler: LoginUsuario.lambda_handler
@@ -30,7 +30,7 @@ functions:
           path: /usuarios/login
           method: post
           cors: true
-	  integration: lambda
+          integration: lambda
 
 resources:
   Resources:
