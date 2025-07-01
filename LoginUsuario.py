@@ -10,7 +10,11 @@ def hash_password(password):
 
 def lambda_handler(event, context):
     try:
-        body = json.loads(event['body'])
+        # Asegura que body sea un dict
+        if isinstance(event['body'], str):
+            body = json.loads(event['body'])
+        else:
+            body = event['body']
 
         tenant_id = body.get('tenant_id')
         user_id = body.get('user_id')
@@ -23,7 +27,6 @@ def lambda_handler(event, context):
             }
 
         hashed_password = hash_password(password)
-
         dynamodb = boto3.resource('dynamodb')
         users_table = dynamodb.Table(os.environ['USERS_TABLE'])
 
@@ -75,3 +78,4 @@ def lambda_handler(event, context):
             'statusCode': 500,
             'body': json.dumps({'error': str(e)})
         }
+
