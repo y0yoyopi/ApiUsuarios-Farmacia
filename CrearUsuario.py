@@ -8,7 +8,11 @@ def hash_password(password):
 
 def lambda_handler(event, context):
     try:
-        body = json.loads(event['body'])
+        # Asegura que body sea un dict
+        if isinstance(event['body'], str):
+            body = json.loads(event['body'])
+        else:
+            body = event['body']
 
         tenant_id = body.get('tenant_id')
         user_id = body.get('user_id')
@@ -20,12 +24,26 @@ def lambda_handler(event, context):
                 'body': json.dumps({'error': 'Missing tenant_id, user_id or password'})
             }
 
-        hashed_password = hash_password(password)
         dynamodb = boto3.resource('dynamodb')
         table_name = os.environ['USERS_TABLE']
         t_usuarios = dynamodb.Table(table_name)
 
-        # Guarda con clave compuesta tenant_id + user_id
+        # Verificar si ya existe ese usuario
+        existing_user = t_usuarios.get_item(
+            Key={
+                'tenant_id': tenant_id,
+                'user_id': user_id
+            }
+        )
+        if 'Item' in existing_user:
+            return {
+                'statusCode': 409,
+                'body': json.dumps({'error': 'User already exists in this tenant'})
+            }
+
+        # Si no existe, se crea
+        hashed_password = hash_password(password)
+
         t_usuarios.put_item(
             Item={
                 'tenant_id': tenant_id,
