@@ -8,7 +8,7 @@ provider:
   timeout: 30
   stage: dev
   iam:
-    role: arn:aws:iam::111222333444:role/LabRole # PONER EL ID
+    role: arn:aws:iam::429960844715:role/LabRole # PONER EL ID
   environment:
     USERS_TABLE: t_usuarios-${sls:stage}
     TOKENS_TABLE: t_tokens_acceso-${sls:stage}
